@@ -54,6 +54,8 @@ IF (ENABLE_DRAFTS)
     ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 ENDIF (ENABLE_DRAFTS)
 
+OPTION (CZMQ_ENABLE_TESTS "Build Tests" ON)
+
 ########################################################################
 # platform.h
 ########################################################################
@@ -560,20 +562,22 @@ set_directory_properties(
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_BINARY_DIR}/src/selftest-ro;${CMAKE_BINARY_DIR}/src/selftest-rw"
 )
 
-foreach(TEST_CLASS ${TEST_CLASSES})
-    add_test(
-        NAME ${TEST_CLASS}
-        COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
-    )
-    set_tests_properties(
-        ${TEST_CLASS}
-        PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT}
-    )
-    set_tests_properties(
-        ${TEST_CLASS}
-        PROPERTIES DEPENDS "copy-selftest-ro;make-selftest-rw"
-    )
-endforeach(TEST_CLASS)
+IF(CZMQ_ENABLE_TESTS)
+  foreach(TEST_CLASS ${TEST_CLASSES})
+      add_test(
+          NAME ${TEST_CLASS}
+          COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
+      )
+      set_tests_properties(
+          ${TEST_CLASS}
+          PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT}
+      )
+      set_tests_properties(
+          ${TEST_CLASS}
+          PROPERTIES DEPENDS "copy-selftest-ro;make-selftest-rw"
+      )
+  endforeach(TEST_CLASS)
+ENDIF()
 
 include(CTest)
 
